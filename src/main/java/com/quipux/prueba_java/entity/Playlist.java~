@@ -1,11 +1,10 @@
 package com.quipux.prueba_java.entity;
 
+import com.quipux.prueba_java.constant.Messages;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -13,28 +12,29 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
-@Table(name = "playlist")
+@Builder
+@Table(name = Messages.PLAYLIST_TABLE_NAME)
 public class Playlist {
 
     @Id
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name", nullable = false, length = 100)
+    @Column(nullable = false, length = 100)
     private String name;
 
-    @Column(name = "description", nullable = false, length = 100)
+    @Column(nullable = false, length = 100)
     private String description;
 
     @ManyToMany
     @JoinTable(
-            name = "playlist_track",
-            joinColumns = @JoinColumn(name = "playlist_id"),
-            inverseJoinColumns = @JoinColumn(name = "track_id")
+            name = Messages.PLAYLIST_TRACK_TABLE_NAME,
+            joinColumns = @JoinColumn(name = Messages.PLAYLIST_ID),
+            inverseJoinColumns = @JoinColumn(name = Messages.TRACK_ID)
     )
-    private List<Track> tracks;
+    private List<Track> tracks = new ArrayList<>();
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = Messages.USER_ID, nullable = false)
     private User user;
 }

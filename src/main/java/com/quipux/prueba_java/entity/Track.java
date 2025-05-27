@@ -1,10 +1,9 @@
 package com.quipux.prueba_java.entity;
 
+import com.quipux.prueba_java.constant.Messages;
+import com.quipux.prueba_java.constant.Values;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,28 +13,29 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
-@Table(name = "track")
+@Builder
+@Table(name = Messages.TRACK_TABLE_NAME)
 public class Track {
 
     @Id
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "title", nullable = false)
+    @Column(nullable = false)
     private String title;
 
-    @Column(name = "artist", nullable = false, length = 100)
+    @Column(nullable = false)
     private String artist;
 
-    @Column(name = "album", nullable = false, length = 100)
+    @Column(nullable = false)
     private String album;
 
-    @Column(name = "year", nullable = false, length = 4)
+    @Column(name = Messages.COLUMN_YEAR_NAME, nullable = false, length = Values.YEAR_LENGTH)
     private String year;
 
-    @Column(name = "genre", nullable = false, length = 100)
+    @Column(nullable = false, length = Values.GENRE_LENGTH)
     private String genre;
 
-    @ManyToMany(mappedBy = "tracks")
+    @ManyToMany(mappedBy = Messages.MAPPED_BY_TRACKS)
     private List<Playlist> playlists = new ArrayList<>();
 }

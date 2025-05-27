@@ -10,11 +10,9 @@ import java.util.Optional;
 public interface PlaylistService {
     PlaylistResponse createPlaylist(PlaylistRequest playlistRequest, User user);
 
-    List<PlaylistResponse> getAllByUser(User user);
+    List<PlaylistResponse> getAllPlaylistsByUser(User user);
 
-    Optional<PlaylistResponse> getByName(String name, User user);
+    PlaylistResponse getPlaylistByName(String name, User user);
 
-    void deleteByName(String name, User user);
-
-    boolean existsByName(String name, User user);
+    void deletePlaylistByName(String name, User user);
 }

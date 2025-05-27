@@ -1,0 +1,17 @@
+package com.quipux.prueba_java.exception;
+
+import java.util.List;
+import java.util.Map;
+
+public class BadRequestException extends RuntimeException {
+
+    private final List<Map<String, String>> errors;
+
+    public BadRequestException(List<Map<String, String>> errors) {
+        this.errors = errors;
+    }
+
+    public List<Map<String, String>> getErrors() {
+        return errors;
+    }
+}

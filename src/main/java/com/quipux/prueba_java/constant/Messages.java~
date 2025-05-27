@@ -9,12 +9,13 @@ public class Messages {
     public static final String GENRE_REQUIRED = "El género no puede estar vacío";
     public static final String YEAR_FORMAT = "El año debe tener 4 caracteres";
 
+    public static final String NAME = "name";
     public static final String NAME_REQUIRED = "El nombre de la lista no puede estar vacío";
     public static final String DESCRIPTION_REQUIRED = "La descripción no puede estar vacía";
     public static final String TRACKS_REQUIRED = "La lista de canciones no puede estar vacía";
     public static final String TRACKS_SIZE_REQUIRED = "Debe haber al menos una canción en la lista";
 
-    public static final String USER_TABLE_NAME = "user";
+    public static final String USER_TABLE_NAME = "\"user\"";
     public static final String MAPPED_BY_USER = "user";
 
     public static final String ROLE_TABLE_NAME = "role";
@@ -29,6 +30,12 @@ public class Messages {
     public static final String TRACK_ID = "track_id";
     public static final String MAPPED_BY_TRACKS = "tracks";
     public static final String COLUMN_YEAR_NAME = "release_year";
+
+    public static final String SPLIT_REGEX = "\\.";
+
+    public static final String NAME_EXISTS = "Ya existe una lista con el mismo nombre";
+
+    public static final String PLAYLIST_NOT_FOUND = "No se ha encontrado ninguna lista con el nombre %s";
 
 
     private Messages() {}

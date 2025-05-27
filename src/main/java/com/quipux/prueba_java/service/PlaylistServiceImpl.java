@@ -1,8 +1,11 @@
 package com.quipux.prueba_java.service;
 
+import com.quipux.prueba_java.constant.Messages;
 import com.quipux.prueba_java.entity.Playlist;
 import com.quipux.prueba_java.entity.Track;
 import com.quipux.prueba_java.entity.User;
+import com.quipux.prueba_java.exception.BadRequestException;
+import com.quipux.prueba_java.exception.NotFoundException;
 import com.quipux.prueba_java.mapper.PlaylistMapper;
 import com.quipux.prueba_java.model.PlaylistRequest;
 import com.quipux.prueba_java.model.PlaylistResponse;
@@ -12,10 +15,7 @@ import com.quipux.prueba_java.repository.TrackRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static com.quipux.prueba_java.mapper.PlaylistMapper.toEntity;
 import static com.quipux.prueba_java.mapper.PlaylistMapper.toResponse;
@@ -29,6 +29,11 @@ public class PlaylistServiceImpl implements PlaylistService{
 
     @Override
     public PlaylistResponse createPlaylist(PlaylistRequest playlistRequest, User user) {
+
+        if (playlistRepository.existsByNameAndUser(playlistRequest.getName(), user)) {
+            throw new BadRequestException(List.of(Map.of(Messages.NAME, Messages.NAME_EXISTS)));
+        }
+
         Set<String> trackSignatures = new HashSet<>();
 
         List<Track> tracks = playlistRequest.getTracks().stream()
@@ -53,26 +58,35 @@ public class PlaylistServiceImpl implements PlaylistService{
     }
 
     @Override
-    public List<PlaylistResponse> getAllByUser(User user) {
+    public List<PlaylistResponse> getAllPlaylistsByUser(User user) {
         return playlistRepository.findByUser(user).stream()
                 .map(PlaylistMapper::toResponse)
                 .toList();
     }
 
     @Override
-    public Optional<PlaylistResponse> getByName(String name, User user) {
-        return playlistRepository.findByNameAndUser(name, user)
+    public PlaylistResponse getPlaylistByName(String name, User user) {
+
+        Optional<PlaylistResponse> playlist = playlistRepository.findByNameAndUser(name, user)
                 .map(PlaylistMapper::toResponse);
-    }
-    @Override
-    public void deleteByName(String name, User user) {
-        playlistRepository.deleteByNameAndUser(name, user);
+
+        if (playlist.isEmpty()) {
+            throw new NotFoundException(Messages.PLAYLIST_NOT_FOUND, name);
+        }
+
+        return playlist.get();
     }
 
     @Override
-    public boolean existsByName(String name, User user) {
-        return playlistRepository.existsByNameAndUser(name, user);
+    public void deletePlaylistByName(String name, User user) {
+
+        if (!playlistRepository.existsByNameAndUser(name, user)) {
+            throw new NotFoundException(Messages.PLAYLIST_NOT_FOUND, name);
+        }
+
+        playlistRepository.deleteByNameAndUser(name, user);
     }
+
 
     private String generateTrackSignature(TrackDto dto) {
         return (dto.getTitle() + "|" + dto.getArtist() + "|" + dto.getAlbum()).toLowerCase().trim();

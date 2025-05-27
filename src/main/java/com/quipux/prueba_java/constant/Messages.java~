@@ -37,6 +37,15 @@ public class Messages {
 
     public static final String PLAYLIST_NOT_FOUND = "No se ha encontrado ninguna lista con el nombre %s";
 
+    public static final String MESSAGE = "message";
+
+    public static final String AUTHORIZATION_HEADER = "Authorization";
+    public static final String BEARER_PREFIX = "Bearer ";
+
+    public static final String INVALID_CREDENTIALS = "Credenciales inválidas";
+
+    public static final String INVALID_TOKEN = "Token inválido";
+
 
     private Messages() {}
 }

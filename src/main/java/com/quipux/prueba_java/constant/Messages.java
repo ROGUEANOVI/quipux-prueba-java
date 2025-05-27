@@ -39,6 +39,15 @@ public class Messages {
 
     public static final String MESSAGE = "message";
 
+    public static final String AUTHORIZATION_HEADER = "Authorization";
+    public static final String BEARER_PREFIX = "Bearer ";
+
+    public static final String INVALID_CREDENTIALS = "Credenciales inválidas";
+
+    public static final String INVALID_TOKEN = "Token inválido";
+
+    public static final String AUTHORITIES = "authorities";
+
 
     private Messages() {}
 }

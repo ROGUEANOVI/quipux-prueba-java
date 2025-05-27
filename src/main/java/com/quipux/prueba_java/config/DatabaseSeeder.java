@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 
@@ -17,6 +18,7 @@ public class DatabaseSeeder {
     private final RoleRepository roleRepository;
     private final TrackRepository trackRepository;
     private final PlaylistRepository playlistRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Bean
     public CommandLineRunner seedDatabase() {
@@ -26,9 +28,9 @@ public class DatabaseSeeder {
             Role adminRole = Role.builder().name("ADMIN").build();
             roleRepository.saveAll(List.of(userRole, adminRole));
 
-            User user1 = User.builder().email("juan@example.com").password("1234").role(userRole).build();
-            User user2 = User.builder().email("ana@example.com").password("abcd").role(userRole).build();
-            User user3 = User.builder().email("admin@example.com").password("admin").role(adminRole).build();
+            User user1 = User.builder().email("juan@example.com").password(passwordEncoder.encode("1234")).role(userRole).build();
+            User user2 = User.builder().email("ana@example.com").password(passwordEncoder.encode("abc")).role(userRole).build();
+            User user3 = User.builder().email("admin@example.com").password(passwordEncoder.encode("admin")).role(adminRole).build();
             userRepository.saveAll(List.of(user1, user2, user3));
 
             Track track1 = Track.builder().title("Rayando el sol").artist("Maná").album("Falta Amor").genre("Rock").year("1990").build();

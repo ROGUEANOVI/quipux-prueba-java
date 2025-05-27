@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 
@@ -17,10 +18,11 @@ public class DatabaseSeeder {
     private final RoleRepository roleRepository;
     private final TrackRepository trackRepository;
     private final PlaylistRepository playlistRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Bean
     public CommandLineRunner seedDatabase() {
-        
+
         return args -> {
             Role userRole = Role.builder().name("USER").build();
             Role adminRole = Role.builder().name("ADMIN").build();

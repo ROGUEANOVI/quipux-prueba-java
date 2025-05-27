@@ -1,0 +1,47 @@
+package com.quipux.prueba_java.security;
+
+import com.quipux.prueba_java.constant.Messages;
+import com.quipux.prueba_java.entity.User;
+import com.quipux.prueba_java.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class UserDetailsServiceImpl implements UserDetailsService {
+
+    private final UserRepository userRepository;
+
+    private final PasswordEncoder passwordEncoder;
+
+    @Override
+    public UserDetails loadUserByUsername(String email) {
+
+        User userEntity = userRepository.findByEmail(email).orElseThrow(() ->
+                new BadCredentialsException(Messages.INVALID_CREDENTIALS));
+
+        List<SimpleGrantedAuthority> authorityList = List.of(new SimpleGrantedAuthority(userEntity.getRole().getName()));
+
+        return new UserDetailsImpl(userEntity.getId(),userEntity.getEmail(), userEntity.getPassword(), authorityList);
+    }
+
+    public Authentication authenticate(String email, String password) {
+
+        UserDetails userDetails = loadUserByUsername(email);
+
+        if (userDetails == null || !passwordEncoder.matches(password, userDetails.getPassword())) {
+            throw new BadCredentialsException(Messages.INVALID_CREDENTIALS);
+        }
+
+        return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+    }
+}

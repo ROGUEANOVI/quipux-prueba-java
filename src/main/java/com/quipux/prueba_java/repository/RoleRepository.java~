@@ -1,0 +1,7 @@
+package com.quipux.prueba_java.repository;
+
+import com.quipux.prueba_java.entity.Role;
+
+public interface RoleRepository extends JpaRepository<Role, Long> {
+    
+}

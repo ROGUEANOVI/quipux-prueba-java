@@ -1,0 +1,8 @@
+package com.quipux.prueba_java.repository;
+
+import com.quipux.prueba_java.entity.Playlist;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface PlaylistRepository extends JpaRepository<Playlist, Long> {
+    
+}

@@ -24,13 +24,13 @@ public class DatabaseSeeder {
     public CommandLineRunner seedDatabase() {
 
         return args -> {
-            Role userRole = Role.builder().name("USER").build();
-            Role adminRole = Role.builder().name("ADMIN").build();
+            Role userRole = Role.builder().name("ROLE_USER").build();
+            Role adminRole = Role.builder().name("ROLE_ADMIN").build();
             roleRepository.saveAll(List.of(userRole, adminRole));
 
-            User user1 = User.builder().email("juan@example.com").password(passwordEncoder.encode("1234")).role(userRole).build();
-            User user2 = User.builder().email("ana@example.com").password(passwordEncoder.encode("abc")).role(userRole).build();
-            User user3 = User.builder().email("admin@example.com").password(passwordEncoder.encode("admin")).role(adminRole).build();
+            User user1 = User.builder().email("juan@example.com").password(passwordEncoder.encode("Xyz123AB")).role(userRole).build();
+            User user2 = User.builder().email("ana@example.com").password(passwordEncoder.encode("aBcD9876")).role(userRole).build();
+            User user3 = User.builder().email("admin@example.com").password(passwordEncoder.encode("Pa55wordX")).role(adminRole).build();
             userRepository.saveAll(List.of(user1, user2, user3));
 
             Track track1 = Track.builder().title("Rayando el sol").artist("Maná").album("Falta Amor").genre("Rock").year("1990").build();
@@ -57,7 +57,14 @@ public class DatabaseSeeder {
                     .tracks(List.of(track3, track4, track6, track7))
                     .build();
 
-            playlistRepository.saveAll(List.of(playlist1, playlist2));
+            Playlist playlist3 = Playlist.builder()
+                    .name("Rock en Español copia")
+                    .description("Lo mejor del rock latinoamericano (copia)")
+                    .user(user1)
+                    .tracks(List.of(track1, track2, track5, track8))
+                    .build();
+
+            playlistRepository.saveAll(List.of(playlist1, playlist2, playlist3));
         };
     }
 }

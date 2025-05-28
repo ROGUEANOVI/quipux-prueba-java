@@ -2,12 +2,14 @@ package com.quipux.prueba_java.security;
 
 import com.quipux.prueba_java.constant.Messages;
 import com.quipux.prueba_java.entity.User;
+import com.quipux.prueba_java.exception.UserNotFoundException;
 import com.quipux.prueba_java.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -43,5 +45,22 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         }
 
         return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+    }
+
+    public User getCurrentUser() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        String email;
+
+        if (principal instanceof UserDetailsImpl userDetails) {
+            email = userDetails.getUsername();
+        } else if (principal instanceof String username) {
+            email = username;
+        } else {
+            throw new UserNotFoundException(Messages.USER_NOT_FOUND, principal.toString());
+        }
+
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException(Messages.USER_NOT_FOUND, email));
     }
 }

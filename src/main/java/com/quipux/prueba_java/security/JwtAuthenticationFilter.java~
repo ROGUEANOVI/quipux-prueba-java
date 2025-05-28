@@ -3,8 +3,6 @@ package com.quipux.prueba_java.security;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.quipux.prueba_java.constant.Messages;
 import com.quipux.prueba_java.constant.Values;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -20,6 +18,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.lang.NonNull;
@@ -33,6 +32,8 @@ import java.util.Map;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
+
+    private final UserDetailsServiceImpl userDetailsServiceImpl;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -57,11 +58,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                     SecurityContext securityContext = SecurityContextHolder.getContext();
 
-                    Authentication authentication = new UsernamePasswordAuthenticationToken(username, null, authorities);
+//                    Authentication authentication = new UsernamePasswordAuthenticationToken(username, null, authorities);
+//
+//                    securityContext.setAuthentication(authentication);
+//
+//                    SecurityContextHolder.setContext(securityContext);
+                    UserDetails userDetails = userDetailsServiceImpl.loadUserByUsername(username); // <-- CORRECTO
 
-                    securityContext.setAuthentication(authentication);
+                    Authentication authentication = new UsernamePasswordAuthenticationToken(
+                            userDetails, null, userDetails.getAuthorities());
 
-                    SecurityContextHolder.setContext(securityContext);
+                    SecurityContext context = SecurityContextHolder.getContext();
+                    context.setAuthentication(authentication);
                 }
             } catch (JwtException ex) {
                 response.setContentType(MediaType.APPLICATION_JSON_VALUE);

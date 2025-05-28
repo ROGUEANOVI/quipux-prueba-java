@@ -3,11 +3,11 @@ package com.quipux.prueba_java.exception;
 import java.util.List;
 import java.util.Map;
 
-public class BadRequestException extends RuntimeException {
+public class PlaylistBadRequestException extends RuntimeException {
 
     private final List<Map<String, String>> errors;
 
-    public BadRequestException(List<Map<String, String>> errors) {
+    public PlaylistBadRequestException(List<Map<String, String>> errors) {
         this.errors = errors;
     }
 

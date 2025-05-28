@@ -3,16 +3,17 @@ package com.quipux.prueba_java.service;
 import com.quipux.prueba_java.entity.User;
 import com.quipux.prueba_java.model.PlaylistRequest;
 import com.quipux.prueba_java.model.PlaylistResponse;
+import jakarta.validation.Valid;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface PlaylistService {
-    PlaylistResponse createPlaylist(PlaylistRequest playlistRequest, User user);
+    PlaylistResponse createPlaylist(@Valid PlaylistRequest playlistRequest);
 
-    List<PlaylistResponse> getAllPlaylistsByUser(User user);
+    List<PlaylistResponse> getAllPlaylistsByUser();
 
-    PlaylistResponse getPlaylistByName(String name, User user);
+    PlaylistResponse getPlaylistByName(String name);
 
-    void deletePlaylistByName(String name, User user);
+    void deletePlaylistByName(String name);
 }

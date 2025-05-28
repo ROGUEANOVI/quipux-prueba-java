@@ -1,0 +1,62 @@
+package com.quipux.prueba_java.service;
+
+import com.quipux.prueba_java.constant.Messages;
+import com.quipux.prueba_java.entity.Role;
+import com.quipux.prueba_java.entity.User;
+import com.quipux.prueba_java.exception.RoleNotFoundException;
+import com.quipux.prueba_java.exception.UserAlreadyExistsException;
+import com.quipux.prueba_java.model.AuthResponse;
+import com.quipux.prueba_java.model.LoginRequest;
+import com.quipux.prueba_java.model.RegisterRequest;
+import com.quipux.prueba_java.repository.RoleRepository;
+import com.quipux.prueba_java.repository.UserRepository;
+import com.quipux.prueba_java.security.JwtService;
+import com.quipux.prueba_java.security.UserDetailsServiceImpl;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+@Service
+@RequiredArgsConstructor
+public class AuthServiceImpl implements AuthService {
+
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
+    private final UserDetailsServiceImpl userDetailsService;
+
+    @Override
+    public AuthResponse login(LoginRequest loginRequest) {
+
+        Authentication authentication = userDetailsService.authenticate(loginRequest.getEmail(), loginRequest.getPassword());
+//        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        String token = jwtService.createToken(authentication);
+
+        return AuthResponse.builder()
+                .accessToken(token)
+                .tokenType(Messages.TOKEN_TYPE_BEARER)
+                .build();
+    }
+
+    @Override
+    public void register(RegisterRequest registerRequest) {
+        if (userRepository.existsByEmail(registerRequest.getEmail())) {
+            throw new UserAlreadyExistsException(Messages.USER_ALREADY_EXISTS, registerRequest.getEmail());
+        }
+
+        Role roleUser = roleRepository.findByName(Messages.ROLE_USER)
+                .orElseThrow(() -> new RoleNotFoundException(Messages.ROLE_NOT_FOUND, Messages.ROLE_USER));
+
+        User user = User.builder()
+                .email(registerRequest.getEmail())
+                .password(passwordEncoder.encode(registerRequest.getPassword()))
+                .role(roleUser)
+                .build();
+
+        userRepository.save(user);
+    }
+}

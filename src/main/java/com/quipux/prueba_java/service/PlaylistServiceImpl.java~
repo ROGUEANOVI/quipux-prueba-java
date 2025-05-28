@@ -4,16 +4,20 @@ import com.quipux.prueba_java.constant.Messages;
 import com.quipux.prueba_java.entity.Playlist;
 import com.quipux.prueba_java.entity.Track;
 import com.quipux.prueba_java.entity.User;
-import com.quipux.prueba_java.exception.BadRequestException;
-import com.quipux.prueba_java.exception.NotFoundException;
+import com.quipux.prueba_java.exception.PlaylistBadRequestException;
+import com.quipux.prueba_java.exception.PlaylistNotFoundException;
 import com.quipux.prueba_java.mapper.PlaylistMapper;
 import com.quipux.prueba_java.model.PlaylistRequest;
 import com.quipux.prueba_java.model.PlaylistResponse;
 import com.quipux.prueba_java.model.TrackDto;
 import com.quipux.prueba_java.repository.PlaylistRepository;
 import com.quipux.prueba_java.repository.TrackRepository;
+import com.quipux.prueba_java.security.UserDetailsServiceImpl;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.*;
 
@@ -22,16 +26,20 @@ import static com.quipux.prueba_java.mapper.PlaylistMapper.toResponse;
 
 @Service
 @RequiredArgsConstructor
+@Validated
 public class PlaylistServiceImpl implements PlaylistService{
 
     private final PlaylistRepository playlistRepository;
     private final TrackRepository trackRepository;
+    private final UserDetailsServiceImpl userDetailsService;
 
+
+    @Transactional
     @Override
-    public PlaylistResponse createPlaylist(PlaylistRequest playlistRequest, User user) {
+    public PlaylistResponse createPlaylist(@Valid PlaylistRequest playlistRequest) {
 
-        if (playlistRepository.existsByNameAndUser(playlistRequest.getName(), user)) {
-            throw new BadRequestException(List.of(Map.of(Messages.NAME, Messages.NAME_EXISTS)));
+        if (playlistRepository.existsByNameAndUser(playlistRequest.getName(), getCurrentUser())) {
+            throw new PlaylistBadRequestException(List.of(Map.of(Messages.NAME, Messages.NAME_EXISTS)));
         }
 
         Set<String> trackSignatures = new HashSet<>();
@@ -50,7 +58,7 @@ public class PlaylistServiceImpl implements PlaylistService{
                 .name(playlistRequest.getName())
                 .description(playlistRequest.getDescription())
                 .tracks(tracks)
-                .user(user)
+                .user(getCurrentUser())
                 .build();
 
         Playlist playlistSaved = playlistRepository.save(playlist);
@@ -58,42 +66,41 @@ public class PlaylistServiceImpl implements PlaylistService{
     }
 
     @Override
-    public List<PlaylistResponse> getAllPlaylistsByUser(User user) {
-        return playlistRepository.findByUser(user).stream()
+    public List<PlaylistResponse> getAllPlaylistsByUser() {
+
+        return playlistRepository.findByUser(getCurrentUser()).stream()
                 .map(PlaylistMapper::toResponse)
                 .toList();
     }
 
     @Override
-    public PlaylistResponse getPlaylistByName(String name, User user) {
+    public PlaylistResponse getPlaylistByName(String name) {
 
-        Optional<PlaylistResponse> playlist = playlistRepository.findByNameAndUser(name, user)
+        User currentUser = userDetailsService.getCurrentUser();
+
+        Optional<PlaylistResponse> playlist = playlistRepository.findByNameAndUser(name, currentUser)
                 .map(PlaylistMapper::toResponse);
 
         if (playlist.isEmpty()) {
-            throw new NotFoundException(Messages.PLAYLIST_NOT_FOUND, name);
+            throw new PlaylistNotFoundException(Messages.PLAYLIST_NOT_FOUND, name);
         }
 
         return playlist.get();
     }
 
+    @Transactional
     @Override
-    public void deletePlaylistByName(String name, User user) {
+    public void deletePlaylistByName(String name) {
 
-        Optional<PlaylistResponse> playlist = playlistRepository.findByNameAndUser(name, user)
-                .map(PlaylistMapper::toResponse);
-
-        if (playlist.isEmpty()) {
-            throw new NotFoundException(Messages.PLAYLIST_NOT_FOUND, name);
+        if (!playlistRepository.existsByNameAndUser(name, getCurrentUser())) {
+            throw new PlaylistNotFoundException(Messages.PLAYLIST_NOT_FOUND, name);
         }
 
-        playlistRepository.deleteByNameAndUser(name, user);
+        playlistRepository.deleteByNameAndUser(name, getCurrentUser());
     }
 
-    @Override
-    public boolean existsPlaylistByName(String name, User user) {
-
-        return playlistRepository.existsByNameAndUser(name, user);
+    private User getCurrentUser() {
+        return userDetailsService.getCurrentUser();
     }
 
     private String generateTrackSignature(TrackDto dto) {

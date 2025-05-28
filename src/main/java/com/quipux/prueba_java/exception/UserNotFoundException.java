@@ -1,0 +1,8 @@
+package com.quipux.prueba_java.exception;
+
+public class UserNotFoundException extends  RuntimeException{
+
+    public UserNotFoundException(String message, String name) {
+        super(String.format(message, name));
+    }
+}

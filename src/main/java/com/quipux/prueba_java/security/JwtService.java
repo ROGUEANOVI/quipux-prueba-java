@@ -41,22 +41,24 @@ public class JwtService {
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
         String authorities = authentication.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
+                .map(a -> a.getAuthority().startsWith("ROLE_") ? a.getAuthority() : "ROLE_" + a.getAuthority())
                 .collect(Collectors.joining(","));
 
         Map<String, Object> claims = new HashMap<>();
-        claims.put("userId", userDetails.getId());
-        claims.put("authorities", authorities);
+        claims.put(Messages.USER_ID, userDetails.getId());
+        claims.put(Messages.AUTHORITIES, authorities);
 
-        return Jwts.builder()
+        var token = Jwts.builder()
+                .setClaims(claims)
                 .setId(UUID.randomUUID().toString())
                 .setIssuer(issuer)
                 .setSubject(userDetails.getUsername())
-                .setClaims(claims)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expiration)) // 1 hora
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
+
+        return token;
     }
 
     public boolean validateToken(String token) {

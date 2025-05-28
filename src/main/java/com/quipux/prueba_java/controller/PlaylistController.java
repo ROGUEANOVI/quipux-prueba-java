@@ -1,0 +1,50 @@
+package com.quipux.prueba_java.controller;
+
+import com.quipux.prueba_java.model.PlaylistRequest;
+import com.quipux.prueba_java.model.PlaylistResponse;
+import com.quipux.prueba_java.service.PlaylistService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/lists")
+@RequiredArgsConstructor
+@Validated
+@PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+public class PlaylistController {
+
+    private final PlaylistService playlistService;
+
+    @PostMapping
+    public ResponseEntity<PlaylistResponse> createPlaylist(@RequestBody PlaylistRequest playlistRequest) {
+
+        PlaylistResponse playlist = playlistService.createPlaylist(playlistRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(playlist);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<PlaylistResponse>> getAllPlaylists() {
+
+        List<PlaylistResponse> playlists = playlistService.getAllPlaylistsByUser();
+        return ResponseEntity.ok(playlists);
+    }
+
+    @GetMapping("/{name}")
+    public ResponseEntity<PlaylistResponse> getPlaylistByName(@PathVariable String name) {
+
+        return ResponseEntity.ok(playlistService.getPlaylistByName(name));
+    }
+
+    @DeleteMapping("/{name}")
+    public ResponseEntity<Void> deletePlaylistByName(@PathVariable String name) {
+
+        playlistService.deletePlaylistByName(name);
+        return ResponseEntity.noContent().build();
+    }
+}

@@ -48,6 +48,31 @@ public class Messages {
 
     public static final String AUTHORITIES = "authorities";
 
+    public static final String USER_NOT_FOUND = "No se ha encontrado un usuario con el email %s";
+
+    public static final String EMAIL_REQUIRED = "El email es requerido";
+
+    public static final String EMAIL_INVALID = "El email es inválido";
+
+    public static final String PASSWORD_REQUIRED = "La contraseña es requerida";
+
+    public static final String PASSWORD_PATTERN = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=\\S+$).{8,}$";
+
+    public static final String PASSWORD_PATTERN_MESSAGE = "La contraseña debe tener al menos 8 caracteres, una letra mayúscula, una letra minúscula y un número";
+
+    public static final String ROLE_NOT_FOUND = "No se ha encontrado un rol con el nombre %s";
+    public static final String ROLE_USER = "ROLE_USER";
+
+    public static final String USER_ALREADY_EXISTS = "Ya existe un usuario con el email %s";
+
+    public static final String TOKEN_TYPE_BEARER = "Bearer";
+
+    public static final String DENY_ALL = "denyAll()";
+
+    public static final String PERMIT_ALL = "permitAll()";
+
+    public static final String HAS_ROLE_ADMIN = "hasRole('ROLE_ADMIN')";
+
 
     private Messages() {}
 }
